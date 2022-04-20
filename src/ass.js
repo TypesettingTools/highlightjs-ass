@@ -4,6 +4,11 @@ Author: Sepro
 Description: Advanced SubStation Alpha (ASS) Subtitle format
 Category: subtitle
 */
+const inlineTags = [
+  'h',
+  'N',
+  'n'  
+]
 
 const overrideTags = [
   'alpha',
@@ -96,7 +101,12 @@ module.exports = function (hljs) {
             excludeBegin: true,
             scope: 'symbol'
           },
-          assTags
+          assTags,
+          {
+            match: hljs.regex.concat(/\\/, hljs.regex.either(...inlineTags)),
+            scope: 'char.escape',
+            relevance: 0
+          }
         ]
       },
       {
