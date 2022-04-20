@@ -1,6 +1,6 @@
 {
   "name": "highlightjs-ass",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "highlight.js language definition for the Advanced SubStation Alpha (ASS) subtitle format",
   "main": "src/ass.js",
   "author": "sepro",

@@ -52,6 +52,7 @@ const overrideTags = [
   'fs',
   'kf',
   'ko',
+  'kt',
   'K',
   'a',
   'b',
