@@ -5,55 +5,111 @@ Description: Advanced SubStation Alpha (ASS) Subtitle format
 Category: subtitle
 */
 
+const overrideTags = [
+  'alpha',
+  'iclip',
+  'xbord',
+  'xshad',
+  'ybord',
+  'yshad',
+  'blur',
+  'bord',
+  'clip',
+  'fade',
+  'fscx',
+  'fscy',
+  'move',
+  'shad',
+  'fad',
+  'fax',
+  'fay',
+  'frx',
+  'fry',
+  'frz',
+  'fsc',
+  'fsp',
+  'org',
+  'pbo',
+  'pos',
+  '1a',
+  '1c',
+  '2a',
+  '2c',
+  '3a',
+  '3c',
+  '4a',
+  '4c',
+  'an',
+  'be',
+  'fe',
+  'fn',
+  'fr',
+  'fs',
+  'kf',
+  'ko',
+  'K',
+  'a',
+  'b',
+  'c',
+  'i',
+  'k',
+  'p',
+  'q',
+  'r',
+  's',
+  't',
+  'u',
+];
+
 module.exports = function (hljs) {
+
+  var assTags = {
+    begin: /{/,
+    end: /}|$/,
+    scope: 'punctuation',
+    contains: [{
+      match: hljs.regex.concat(/\\/, hljs.regex.either(...overrideTags)),
+      scope: 'title.function',
+      starts: {
+        scope: 'params',
+        end: hljs.regex.lookahead(/\\|\}/),
+        excludeEnd: true,
+      },
+      relevance: 5
+    }],
+    relevance: 0
+  }
+
   return {
-    aliases: ['ass', 'AdvancedSubStationAlpha'],
+    aliases: ['ass', 'AdvancedSubStationAlpha', 'ssa'],
     case_insensitive: true,
     contains: [
+      assTags, // allow highlighting of text witout "Dialogue: " prefix
       {
-        begin: '(?:^|\n)Dialogue: ',
+        begin: /^Dialogue: /,
         beginScope: 'attr',
-        end: '(?=$|\n)',
+        end: /$/,
         contains: [
           {
-            begin: '\\d*,\\d+:\\d\\d:\\d\\d.\\d\\d,\\d+:\\d\\d:\\d\\d.\\d\\d,',
-            end: '(?=,)',
+            begin: /\d*,\d+:\d\d:\d\d.\d+,\d+:\d\d:\d\d.\d+,/,
+            end: hljs.regex.lookahead(/,/),
             excludeBegin: true,
             scope: 'symbol'
           },
-          {
-            begin: ',[^,]*,\\d*,\\d*,\\d*,[^,]*,',
-            excludeBegin: true,
-            end: '(?=$|\n)',
-            scope: 'string',
-            contains: [
-              {
-                begin: '{',
-                end: '}|\n',
-                scope: 'subst',
-                contains: [{
-                  match: '\\\\(alpha|bord|xbord|ybord|shad|xshad|yshad|fade|clip|iclip|blur|move|fscx|fscy|fsp|frx|fry|fsc|frz|fax|fay|pos|org|fad|pbo|fr|fn|fs|be|fe|1c|2c|3c|4c|1a|2a|3a|4a|an|kf|ko|c|a|k|K|q|r|p|i|b|u|s|t)',
-                  scope: 'title.function',
-                  starts: {
-                    scope: 'params',
-                    end: '(?=\\\\|\\})',
-                    excludeEnd: true,
-                  }
-                }]
-              }
-            ]
-          }
+          assTags
         ]
       },
       {
         scope: 'section',
-        match: '(?:^|\n)\\[.*\\]'
+        match: /^\[.*\]$/,
+        relevance: 1
       },
-      hljs.COMMENT('^;', '$'),
-      hljs.COMMENT('^Comment: ', '$'),
+      hljs.COMMENT(/^;/, /$/),
+      hljs.COMMENT(/^Comment: /, /$/),
       {
         scope: 'attr',
-        match: '(?:^|\n)(?!Dialogue: |Comment: )[^,:\\[\\]]+: '
+        match: /^(?!Dialogue: |Comment: )[^,:\[\]\n]+: /,
+        relevance: 0
       }
     ]
   }
